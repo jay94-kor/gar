@@ -134,13 +134,42 @@
 
 3. AI 분석 (Laravel AI SDK)
    프롬프트: 추출된 텍스트 → 구조화된 JSON
-   ├── 차량 정보: 차종, 대수, 연식, 옵션
-   ├── 계약 조건: 기간, 보증금, 약정거리
+
+   ★ 견적 핵심 변수 (반드시 파싱):
+   ├── 차량 상세
+   │   ├── 제조사 (현대/기아/제네시스/BMW/벤츠 등)
+   │   ├── 모델명 (그랜저/쏘나타/EV9/아이오닉5 등)
+   │   ├── 트림/등급 (익스클루시브/프레스티지/롱레인지 등)
+   │   ├── 연료 (가솔린/디젤/하이브리드/전기)
+   │   ├── 대수
+   │   ├── 연식 조건 (신차/2024년식 이후 등)
+   │   ├── 인승 (5인승/7인승/11인승/15인승)
+   │   ├── 색상 (외장/내장)
+   │   └── 추가옵션 (HUD/썬팅/블랙박스/스노우타이어/네비 등)
+   │
+   ├── 계약 핵심 조건
+   │   ├── 계약기간 (개월 수)
+   │   ├── 선납금 (% 또는 금액, 0원 여부)
+   │   ├── 보증금 (면제 여부)
+   │   ├── 연간주행거리 (제한 없음 / km 단위)
+   │   ├── 잔존가치 (% 또는 반납 조건)
+   │   ├── 개시대여료
+   │   └── 임차료 지급방식 (월 후불/선불)
+   │
    ├── 자격 요건: 업종, 지역제한, 기업규모
-   ├── 보험 조건: 대인/대물/자차/긴급출동
-   ├── 평가 방식: 적격심사/최저가/협상
+   ├── 보험 조건
+   │   ├── 대인1/대인2 (무한 여부)
+   │   ├── 대물 (한도액)
+   │   ├── 자차 (면책금)
+   │   ├── 자기신체/자동차상해 (한도)
+   │   ├── 무보험차상해
+   │   ├── 운전자 조건 (만26세 이상 등)
+   │   ├── 운전자 범위 (임직원 한정/누구나)
+   │   └── 긴급출동 (횟수)
+   │
+   ├── 평가 방식: 적격심사/최저가/협상, 낙찰하한율
    ├── 입찰 일정: 마감일, 개찰일
-   └── 특수 조건: 대차, 정비, 스노우타이어 등
+   └── 특수 조건: 대차 의무, 정비 주기, 스노우타이어/체인, 3회 고장 시 교체 등
 
 4. 분석 결과 DB 저장 → 입찰 카드 생성
 ```
@@ -333,13 +362,56 @@
 |------|------|------|
 | id | bigint | PK |
 | bid_id | FK | bids.id |
-| vehicles | json | 차종/대수/연식/옵션 |
-| contract_terms | json | 기간/보증금/약정거리 |
 | qualifications | json | 자격요건 |
-| insurance | json | 보험조건 |
 | evaluation | json | 평가방식/낙찰하한율 |
 | special_conditions | json | 특수조건 |
 | summary | text | AI 요약 |
+
+### bid_vehicles (차량 상세 — 공고당 N대)
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | bigint | PK |
+| bid_id | FK | bids.id |
+| manufacturer | varchar | 제조사 (현대/기아 등) |
+| model | varchar | 모델명 (그랜저/EV9 등) |
+| trim | varchar | 트림/등급 (익스클루시브 등) |
+| fuel_type | enum | gasoline/diesel/hybrid/electric |
+| seats | int | 인승 |
+| quantity | int | 대수 |
+| year_condition | varchar | 연식 조건 (신차/2022년식 이후 등) |
+| color_exterior | varchar | 외장색 |
+| color_interior | varchar | 내장색 |
+| options | json | 추가옵션 목록 |
+
+### bid_contracts (계약 조건)
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | bigint | PK |
+| bid_id | FK | bids.id |
+| contract_months | int | 계약기간 (개월) |
+| prepayment_rate | decimal | 선납금 비율 (%) |
+| prepayment_amount | bigint | 선납금 금액 (원) |
+| deposit | bigint | 보증금 (0=면제) |
+| annual_mileage | int | 연간주행거리 (null=무제한) |
+| residual_value_rate | decimal | 잔존가치 (%) |
+| opening_fee | bigint | 개시대여료 |
+| payment_method | varchar | 지급방식 (월후불 등) |
+
+### bid_insurance (보험 조건)
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | bigint | PK |
+| bid_id | FK | bids.id |
+| liability_1 | varchar | 대인1 |
+| liability_2 | varchar | 대인2 (무한 등) |
+| property_damage | bigint | 대물 한도 (원) |
+| own_vehicle | boolean | 자차 가입 여부 |
+| own_vehicle_deductible | int | 자차 면책금 (원) |
+| personal_injury | varchar | 자기신체/자동차상해 |
+| uninsured_motorist | varchar | 무보험차상해 |
+| driver_age_min | int | 운전자 최소 연령 |
+| driver_scope | varchar | 운전자 범위 (임직원한정 등) |
+| emergency_service | varchar | 긴급출동 (가입/횟수) |
 
 ### companies (고객사 - 렌트사)
 | 컬럼 | 타입 | 설명 |
