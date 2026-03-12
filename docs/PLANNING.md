@@ -357,15 +357,114 @@
 | file_path | varchar | 로컬 저장 경로 |
 | extracted_text | text | 추출된 텍스트 |
 
-### bid_analyses (AI 분석)
+### bid_analyses (AI 분석 요약)
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
 | id | bigint | PK |
 | bid_id | FK | bids.id |
-| qualifications | json | 자격요건 |
-| evaluation | json | 평가방식/낙찰하한율 |
-| special_conditions | json | 특수조건 |
+| special_conditions | json | 특수조건 (대차의무, 스노우타이어 등) |
 | summary | text | AI 요약 |
+
+### bid_qualifications (자격요건 + 적격심사 정량서류)
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | bigint | PK |
+| bid_id | FK | bids.id |
+| **입찰 자격** | | |
+| biz_registration | varchar | 업종코드 (1457 자동차대여사업 등) |
+| region_limit | varchar | 지역제한 (null=없음, 충남/경남 등) |
+| company_size_limit | enum | null/micro/small/medium (소기업/소상공인 제한) |
+| joint_contract | boolean | 공동도급 허용 여부 |
+| subcontract | boolean | 하도급 허용 여부 |
+| **낙찰 방식** | | |
+| evaluation_method | enum | competitive/negotiation/estimate (일반경쟁/협상/수의) |
+| evaluation_standard | varchar | 적용기준 (별표8 임대차/경기도 별표1-6 등) |
+| success_threshold | decimal | 낙찰하한율 (%) |
+| passing_score | int | 종합평점 합격점 (85점/88점/95점) |
+| **적격심사 배점 (별표8 임대차 기준)** | | |
+| score_performance | int | 이행실적 배점한도 (기본 10점) |
+| score_financial | int | 경영상태 배점한도 (기본 20점) |
+| score_afterservice | int | 사후관리(A/S) 배점한도 (기본 15점) |
+| score_price | int | 입찰가격 배점한도 (기본 55점) |
+| score_credibility_plus | decimal | 신인도 가점 한도 (+4.25) |
+| score_credibility_minus | decimal | 신인도 감점 한도 (-5.0) |
+| score_disqualify | int | 결격사유 감점 (-20) |
+| score_adjusted | boolean | 배점 조정 여부 (±20% 가능) |
+| **제출서류** | | |
+| required_docs | json | 필수 제출서류 목록 |
+
+### bid_performance_requirements (이행실적 요구사항)
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | bigint | PK |
+| bid_id | FK | bids.id |
+| **실적 기준** | | |
+| performance_type | enum | same/similar/any (동등이상/유사/무관) |
+| performance_scope | text | 실적 범위 설명 (차량 임대차 등) |
+| performance_years | int | 실적 인정 기간 (5년, 소기업 7년) |
+| min_amount | bigint | 최소 실적 금액 (원, null=없음) |
+| min_count | int | 최소 실적 건수 (null=없음) |
+| min_quantity | int | 최소 실적 규모-대수 (null=없음) |
+| **이행실적 등급별 배점** | | |
+| grade_criteria | json | 등급별 기준+배점 (아래 참조) |
+
+> **이행실적 등급 (별표8 기준)**
+> - A등급 (10점): 추정가격 100% 이상 실적
+> - B등급 (8점): 추정가격 70~100% 실적
+> - C등급 (6점): 추정가격 50~70% 실적
+> - D등급 (4점): 추정가격 30~50% 실적
+> - E등급 (2점): 추정가격 30% 미만 실적
+> - F등급 (0점): 실적 없음
+> ※ 소기업/소상공인: 실적 인정기간 7년, 최소 2점 보장
+
+### bid_financial_requirements (경영상태 요구사항)
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | bigint | PK |
+| bid_id | FK | bids.id |
+| **신용평가 기준 (별표10)** | | |
+| eval_method | enum | credit_rating/financial_statement (신용등급/재무제표) |
+| min_credit_grade | varchar | 최소 신용등급 (BBB- 등, null=없음) |
+| **재무제표 기준 (신용등급 없을 때)** | | |
+| max_debt_ratio | decimal | 최대 부채비율 (%) |
+| min_current_ratio | decimal | 최소 유동비율 (%) |
+| min_equity | bigint | 최소 자기자본 (원) |
+
+> **경영상태 등급 (별표10 신용평가등급 기준)**
+> - 20점: AA- 이상
+> - 18점: A+ ~ A-
+> - 16점: BBB+ ~ BBB
+> - 14점: BBB-
+> - 12점: BB+ ~ BB
+> - 10점: BB-
+> - 8점: B+ 이하
+> - 0점: 부도/워크아웃 등
+
+### bid_credibility_items (신인도 가감점 항목)
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | bigint | PK |
+| bid_id | FK | bids.id |
+| item_type | enum | plus/minus (가점/감점) |
+| item_name | varchar | 항목명 |
+| score | decimal | 점수 |
+| description | text | 설명 |
+
+> **신인도 가점 (별표11, 최대 +4.25)**
+> - +1.0: ISO 9001/14001 인증
+> - +1.0: 직접생산확인서 보유
+> - +0.75: 여성기업/장애인기업/사회적기업/자활기업
+> - +0.5: 녹색기업/환경경영인증
+> - +0.5: 고용우수기업 인증
+> - +0.25: 기술혁신형(이노비즈)/경영혁신형(메인비즈)
+> - +0.25: 산재예방 우수사업장
+>
+> **신인도 감점 (별표11, 최대 -5.0)**
+> - -2.0: 부정당업자 제재 이력 (최근 2년)
+> - -1.0: 계약불이행/부실이행 이력
+> - -1.0: 산업재해 발생 (사망)
+> - -0.5: 고용관련 법령 위반
+> - -0.5: 환경법령 위반
 
 ### bid_vehicles (차량 상세 — 공고당 N대)
 | 컬럼 | 타입 | 설명 |
