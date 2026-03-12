@@ -27,7 +27,7 @@ gar/
 │   │   ├── Company.php             # 렌트사 (고객)
 │   │   ├── CompanyPreference.php   # 알림 설정
 │   │   ├── CompanyFleet.php        # 보유 차종
-│   │   ├── PriceTable.php          # 단가표
+│   │   ├── CompanyCredential.php   # 시뮬레이션용 프로필
 │   │   └── User.php
 │   │
 │   ├── Services/
@@ -54,9 +54,8 @@ gar/
 │   │   │   ├── ScoreCalculator.php       # 매칭 점수 계산
 │   │   │   └── SimulationEngine.php      # 적격심사 시뮬레이션
 │   │   │
-│   │   ├── Estimator/
-│   │   │   ├── EstimateGenerator.php     # 견적서 생성
-│   │   │   └── PriceOptimizer.php        # 최적 투찰가 계산
+│   │   ├── Simulator/
+│   │   │   └── SimulationEngine.php      # 적격심사 시뮬레이션
 │   │   │
 │   │   └── Notification/
 │   │       ├── NotificationService.php    # 알림 서비스
@@ -85,8 +84,7 @@ gar/
 │   │       ├── CompanyController.php      # 회사 프로필
 │   │       ├── FleetController.php        # 보유 차종 관리
 │   │       ├── PreferenceController.php   # 알림 설정
-│   │       ├── PriceTableController.php   # 단가표 관리
-│   │       ├── EstimateController.php     # 견적서 생성
+│   │       ├── CredentialController.php   # 시뮬레이션 프로필
 │   │       ├── SimulationController.php   # 적격심사 시뮬레이션
 │   │       └── ChecklistController.php    # 서류 체크리스트
 │   │
@@ -111,11 +109,8 @@ gar/
 │       │   │   ├── Profile.vue        # 회사 정보
 │       │   │   ├── Fleet.vue          # 보유 차종
 │       │   │   └── Preferences.vue    # 알림 설정
-│       │   ├── PriceTable/
-│       │   │   └── Index.vue          # 단가표 관리
-│       │   └── Estimates/
-│       │       ├── Index.vue          # 견적서 목록
-│       │       └── Show.vue           # 견적서 상세
+│       │   └── Simulation/
+│       │       └── Show.vue           # 적격심사 시뮬레이션
 │       │
 │       └── Components/
 │           ├── BidCard.vue            # 공고 요약 카드
@@ -147,7 +142,7 @@ gar/
 │       ├── create_companies_table.php
 │       ├── create_company_preferences_table.php
 │       ├── create_company_fleets_table.php
-│       └── create_price_tables_table.php
+│       └── create_company_credentials_table.php
 │
 ├── config/
 │   ├── gar.php                # GAR 설정 (API키, 분류코드, 제외키워드)

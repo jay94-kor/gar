@@ -79,16 +79,16 @@
 
 - 목록/상세 사용 흐름이 깨지지 않음
 
-## Epic 7. Estimation
+## Epic 7. Simulation
 
-- [ ] 단가표 스키마 확장
-- [ ] 견적 산식 구현
-- [ ] 견적 상세 화면 구현
-- [ ] PDF 출력
+- [ ] 적격심사 시뮬레이션 엔진
+- [ ] 프로필 기반 점수 계산 (이행실적/경영상태/사후관리/신인도)
+- [ ] 부족 항목 안내 + 프로필 완성 유도 UI
 
 ### Done Criteria
 
-- 특정 공고 기준 초안 견적 생성 가능
+- 프로필 입력 후 공고별 예상 점수 산출 가능
+- 프로필 미완성 시 부분 계산 + 안내 표시
 
 ## Epic 8. Operational Readiness
 
@@ -108,4 +108,5 @@
 3. Documents
 4. Analysis
 5. Matching & Notifications
-6. Estimation
+6. Search & UI Polish
+7. Simulation

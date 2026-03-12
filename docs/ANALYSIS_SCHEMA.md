@@ -117,8 +117,8 @@
 | `insurance` | `bid_insurance` |
 | `qualification` | `bid_qualifications` |
 | `evaluation` | `bid_qualifications` |
-| `performance_requirement` | `bid_performance_requirements` |
-| `required_documents` | `bid_qualifications.required_docs` |
+| `performance_requirement` | `bid_performances` |
+| `required_documents` | `bid_checklists` |
 | `special_conditions` | `bid_analyses.special_conditions` |
 
 ## 8. 수동 검토 플래그

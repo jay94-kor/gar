@@ -14,10 +14,17 @@
 | Company | 고객사(렌트사) | `company.id` |
 | CompanyFleet | 고객사 보유 차종/대수 | `company_id + vehicle_key` |
 | CompanyPreference | 관심 지역/예산/기간/채널 | `company_id` |
+| BidVehicle | 공고 요구 차량 상세 (공고당 N대) | `bid_id + seq` |
+| BidContract | 공고 계약 조건 | `bid_id` |
+| BidInsurance | 공고 보험 조건 | `bid_id` |
+| BidQualification | 자격요건 + 적격심사 배점 | `bid_id` |
+| BidPerformance | 이행실적 요구사항 | `bid_id` |
+| BidFinancial | 경영상태 요구사항 | `bid_id` |
+| BidCredibility | 신인도 가감점 항목 | `bid_id + item_name` |
+| BidChecklist | 서류 체크리스트 | `bid_id + stage` |
 | MatchResult | 공고와 고객사의 적합도 평가 결과 | `bid_id + company_id + matching_version` |
 | NotificationLog | 발송 이력과 중복 방지 키 | `dedupe_key` |
-| Estimate | 견적서 헤더 | `estimate.id` |
-| EstimateLineItem | 견적 구성 항목 | `estimate_id + line_no` |
+| CompanyCredential | 시뮬레이션용 프로필 (신용등급/실적/인증) | `company_id` |
 
 ## 2. 상태 모델
 
@@ -79,22 +86,20 @@
 | `notified` | 즉시 알림 발송 완료 |
 | `suppressed` | 중복/야간/사용자 설정으로 미발송 |
 
-### 2.5 Estimate
+### 2.5 SimulationResult
 
 | 상태 | 의미 |
 |------|------|
-| `draft` | 초안 생성 |
-| `ready` | 계산 완료, 검토 가능 |
-| `review_required` | 누락 정보 또는 예외로 수동 검토 필요 |
-| `exported` | PDF 또는 외부 제출용 파일 생성 완료 |
-| `archived` | 더 이상 사용하지 않음 |
+| `calculated` | 점수 계산 완료 |
+| `incomplete` | 프로필 정보 부족으로 부분 계산 |
+| `stale` | 프로필 또는 공고 변경으로 재계산 필요 |
 
 ## 3. 불변식
 
 - `bids`는 `bid_ntce_no + bid_ntce_ord`로 유일해야 한다.
 - 동일 공고에 대해 최신 `validated` 분석은 하나만 `is_current=true`를 가진다.
 - `NotificationLog.dedupe_key`는 `(company_id, bid_id, notification_type, channel)` 기준으로 유일해야 한다.
-- `Estimate`는 특정 `bid_id`와 `company_id` 조합에서 여러 버전이 가능하지만 하나만 `current_version=true`를 가진다.
+- `SimulationResult`는 `(company_id, bid_id)` 조합당 하나만 유효하며 프로필/공고 변경 시 재계산한다.
 - 삭제 대신 소프트 삭제 또는 상태 전이로 처리한다.
 
 ## 4. 책임 경계
@@ -107,7 +112,7 @@
 | Analyzer | `BidAnalysis` 버전 생성, 파생 테이블 저장, `Bid` 내부 상태 업데이트 |
 | Matcher | `MatchResult` 생성/업데이트 |
 | Notification | `NotificationLog` 생성/전송 상태 업데이트 |
-| Estimator | `Estimate`, `EstimateLineItem` 생성/버전 관리 |
+| Simulator | `SimulationResult` 생성/재계산 |
 
 ## 5. 추천 스키마 보강
 
@@ -119,18 +124,19 @@
 - `bid_analyses.status`, `bid_analyses.schema_version`, `bid_analyses.prompt_version`, `bid_analyses.confidence`
 - `match_results` 테이블
 - `notification_logs` 테이블
-- `estimates` / `estimate_line_items` 테이블
+- `simulation_results` 테이블
+- `company_credentials` 테이블
 
 ## 6. 수동 검토가 필요한 조건
 
 - 첨부파일이 전부 파싱 실패한 경우
 - 분석 결과가 `needs_review`인 경우
 - 자격요건과 평가기준이 충돌하는 경우
-- 견적 계산에 필요한 단가 항목이 누락된 경우
+- 시뮬레이션에 필요한 프로필 정보가 부족한 경우
 
 ## 7. 구현 결정
 
 - 외부 조달 상태와 내부 파이프라인 상태는 분리 저장한다.
 - 분석 결과는 덮어쓰기 대신 버전 스냅샷으로 저장한다.
 - 알림은 반드시 발송 이력 기반으로 dedupe 한다.
-- 견적은 재생산 가능해야 하므로 계산 시 사용한 단가표 버전을 저장한다.
+- 시뮬레이션 결과는 계산 시 사용한 프로필 스냅샷 해시를 함께 저장한다.

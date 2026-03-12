@@ -22,7 +22,6 @@
 - `analysis`
 - `matching`
 - `notifications`
-- `estimates`
 
 ## 4. 재시도 정책
 
@@ -39,7 +38,6 @@
 - 수집은 `bid_ntce_no + bid_ntce_ord`
 - 첨부는 `bid_id + normalized_url`
 - 알림은 `dedupe_key`
-- 견적은 `company_id + bid_id + price_table_version`
 
 ## 6. 저장소 정책
 
@@ -78,7 +76,7 @@
 
 - DB 일일 백업
 - 첨부 스토리지 주간 백업
-- 가격표와 견적 데이터는 복구 우선순위 상위
+- 프로필과 시뮬레이션 데이터는 복구 우선순위 상위
 
 ## 10. 운영 전 체크리스트
 
