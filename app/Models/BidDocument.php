@@ -19,6 +19,9 @@ class BidDocument extends Model
             'seq' => 'integer',
             'download_attempts' => 'integer',
             'parse_attempts' => 'integer',
+            'file_size' => 'integer',
+            'downloaded_at' => 'datetime',
+            'parsed_at' => 'datetime',
             'file_type' => DocumentType::class,
         ];
     }
