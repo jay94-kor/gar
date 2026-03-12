@@ -1,5 +1,7 @@
 # GAR (Government Auto Rent) - 기획서
 
+> 이 문서는 제품/시장/로드맵을 빠르게 훑는 개요 문서입니다. 구현 계약은 [README.md](README.md), [DOMAIN_MODEL.md](DOMAIN_MODEL.md), [G2B_API_SPEC.md](G2B_API_SPEC.md), [ANALYSIS_SCHEMA.md](ANALYSIS_SCHEMA.md)를 기준으로 봅니다.
+
 ## 🎯 서비스 개요
 
 **GAR**은 나라장터(G2B) 차량 렌트/임차 입찰공고를 자동 수집·분석하여, 자동차대여(렌트) 사업자에게 맞춤형 입찰 정보를 제공하는 SaaS 플랫폼입니다.

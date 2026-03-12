@@ -1,5 +1,7 @@
 # GAR 개발 구조
 
+> 이 문서는 목표 아키텍처 개요입니다. 상태 전이와 구현 계약은 [DOMAIN_MODEL.md](DOMAIN_MODEL.md), 외부 수집 계약은 [G2B_API_SPEC.md](G2B_API_SPEC.md), AI 저장 계약은 [ANALYSIS_SCHEMA.md](ANALYSIS_SCHEMA.md)를 우선합니다.
+
 ## 디렉토리 구조
 
 ```
