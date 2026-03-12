@@ -30,6 +30,7 @@
     "key_points": ["핵심 포인트"]
   },
   "vehicles": [],
+  "procurement": {},
   "contract": {},
   "insurance": {},
   "qualification": {},
@@ -57,6 +58,20 @@
 - `quantity`는 정수
 - `fuel_type` enum: `gasoline`, `diesel`, `hybrid`, `electric`, `lpg`
 - `options`는 문자열 배열
+
+### procurement
+
+- `vehicle_condition` enum: `new_only`, `used_ok`, `unspecified`
+  - `new_only`: "신차", "미등록", "출고 후 운행이력 없는 차량" 등 명시
+  - `used_ok`: 연식 조건만 있고 신차 요구 없음 (예: "2023년식 이후")
+  - `unspecified`: 조건 미명시
+- `year_threshold`: 연식 하한 (예: `2023`, null이면 미명시)
+- `registration_requirement`: "사업용 등록", "허 번호판" 등 명시 여부 (boolean)
+- `funding_implication` enum: `purchase_required`, `stock_eligible`, `unknown`
+  - 렌트사 입장 자금 부담 판단 보조 필드
+  - `purchase_required`: 신차 구매 필수 (vehicle_condition=new_only)
+  - `stock_eligible`: 보유 재고 투입 가능 (vehicle_condition=used_ok이고 연식 조건 충족 가능)
+  - `unknown`: 판단 불가
 
 ### contract
 
@@ -115,6 +130,7 @@
 | `vehicles` | `bid_vehicles` |
 | `contract` | `bid_contracts` |
 | `insurance` | `bid_insurance` |
+| `procurement` | `bid_contracts` (또는 별도 컬럼) |
 | `qualification` | `bid_qualifications` |
 | `evaluation` | `bid_qualifications` |
 | `performance_requirement` | `bid_performances` |

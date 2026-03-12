@@ -491,6 +491,9 @@
 |------|------|------|
 | id | bigint | PK |
 | bid_id | FK | bids.id |
+| vehicle_condition | enum | new_only/used_ok/unspecified (차량 조달 조건) |
+| year_threshold | int | 연식 하한 (2023 등, null=미명시) |
+| funding_implication | enum | purchase_required/stock_eligible/unknown (자금 부담 판단) |
 | contract_months | int | 계약기간 (개월) |
 | prepayment_rate | decimal | 선납금 비율 (%) |
 | prepayment_amount | bigint | 선납금 금액 (원) |

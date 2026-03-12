@@ -28,6 +28,13 @@
     }
   ],
 
+  "procurement": {
+    "vehicle_condition": "new_only|used_ok|unspecified (신차만/중고가능/미명시)",
+    "year_threshold": "연식 하한 (2023 등, null=미명시)",
+    "registration_requirement": true|false,
+    "funding_implication": "purchase_required|stock_eligible|unknown"
+  },
+
   "contract": {
     "period_months": "계약기간 (개월)",
     "prepayment_rate": "선납금 비율 (%)",
@@ -164,6 +171,7 @@
 💰 예산 {금액} | 📅 마감 {날짜}
 
 🚗 차량: {차종} {대수}대 ({연식조건})
+🏷️ 조달: {🟢 재고 투입 가능 / 🔴 신차 구매 필수 / ⚪ 미명시}
 ⏱️ 기간: {개월}개월 | 거리: {제한/무제한}
 💳 선납금: {%} | 보증금: {면제/금액}
 
