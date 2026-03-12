@@ -52,7 +52,6 @@ gar/
 │   │   ├── Matcher/
 │   │   │   ├── BidMatcher.php            # 공고-렌트사 매칭
 │   │   │   ├── ScoreCalculator.php       # 매칭 점수 계산
-│   │   │   └── SimulationEngine.php      # 적격심사 시뮬레이션
 │   │   │
 │   │   ├── Simulator/
 │   │   │   └── SimulationEngine.php      # 적격심사 시뮬레이션
