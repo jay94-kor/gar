@@ -35,6 +35,11 @@ class Bid extends Model
         return $this->hasOne(BidAnalysis::class)->where('is_current', true);
     }
 
+    public function result(): HasOne
+    {
+        return $this->hasOne(BidResult::class);
+    }
+
     public function documents(): HasMany
     {
         return $this->hasMany(BidDocument::class);
